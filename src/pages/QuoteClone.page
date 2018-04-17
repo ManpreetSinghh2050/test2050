@@ -1,0 +1,64 @@
+<apex:page standardController="Opportunity" extensions="QuoteCloneController">
+<head>
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
+      <apex:stylesheet value="{!URLFOR($Resource.SLDSConfigure,'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+      <style>
+         *{padding:0;margin:0}
+         body{background:url("/resource/SLDSConfigure/assets/images/body-noise.jpg") repeat 0 0;font-family:"Salesforce Sans", Arial, sans-serif}
+         .slds-container--large,.slds-container--x-large{ margin: 0 auto;padding:0 1rem}
+         .quote-description{padding:0.5rem 0  0 0}
+         .quote-description .slds-box{padding:0;overflow-x:auto;border-radius:0.25rem 0.25rem 0 0;max-height:900px; }
+         .quote-description .slds-table--bordered{border:none}
+         .quote-description .slds-table--bordered th{font-weight:700;background:#e8f0fc;}
+         .quote-description .slds-table--bordered tbody tr:nth-child(odd) td {background:#f4f6f9}    
+         .quote-description h3.slds-text-heading--medium{font-size:1.2rem;background:#009ddc;color:#fff;display:block;font-family:"Salesforce Sans", Arial, sans-serif;padding:0.27rem 0.5rem;border-radius: .25rem .25rem 0 0;text-align:center;font-weight:400}
+         .quote-description .slds-table td{vertical-align: middle;}
+         .quote-description .slds-table .slds-button{line-height:1.6rem}
+
+      </style>
+   </head>
+  <body> 
+   <div class="Configuration-sec">
+  <div class="slds-container--x-large">
+   <apex:form >
+     <apex:pageMessages />
+     <apex:outputPanel id="outputPanel1">
+     <div class="quote-description">
+     <h3 class="slds-text-heading--medium ">Quote Clone</h3>
+        <div class="slds-box">
+            <table class="slds-table slds-table--bordered">
+            <thead>
+                <tr>
+                   <th>Quote Number</th>
+                   <th>Quote Name</th>
+                   <th>Expiration Date</th>
+                   <th>Subtotal</th>
+                   <th>Total Price</th>
+                   <th colspan="2">Created By</th>
+                </tr>
+              </thead>  
+               <apex:repeat value="{!quoteList}" var="quoteVar">
+               <tr>
+               <td> <apex:OutputText styleClass="input-field" value="{!quoteVar.QuoteNumber}"/></td>
+                <td><apex:outputText styleClass="input-field" value="{!quoteVar.Name}"/></td>
+                <td><apex:outputField styleClass="input-field" value="{!quoteVar.ExpirationDate}"/></td>
+                <td><apex:OutputText styleClass="input-field" value="{!quoteVar.Subtotal}"/></td>
+                <td><apex:OutputText styleClass="input-field" value="{!quoteVar.TotalPrice}"/></td>
+                <td><apex:OutputText styleClass="input-field" value="{!quoteVar.CreatedBy.Name}"/></td>
+                <td>
+                <apex:commandLink value="Clone" action="{!quoteCloning}" styleClass="slds-button slds-button--brand">
+                <apex:param name="nickName" value="{!quoteVar.id}" assignTo="{!quoteIdparam}"/>
+                </apex:commandLink>
+                </td>
+                
+               </tr>
+               </apex:repeat> 
+               </table> 
+        </div>
+        </div> 
+    </apex:outputPanel>
+</apex:form> 
+</div>
+</div> 
+</body>  
+</apex:page>

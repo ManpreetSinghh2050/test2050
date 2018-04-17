@@ -1,0 +1,328 @@
+<apex:page controller="ColourCodeOpportunityController" sidebar="false" showheader="false"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <apex:stylesheet value="{!URLFOR($Resource.SLDSConfigure,'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.FusionChart, '/fusioncharts/js/fusioncharts.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.FusionChart, '/js/themes/fusioncharts.theme.fint.js')}"/>
+<style>
+.requiredLoaderBG{
+            background-color: rgb(71,71,71);opacity:0.7;filter:alpha(opacity=70);background-image:url({!URLFOR($Resource.Loader)});
+            
+            background-position: center center;background-repeat: no-repeat;height: 100%;left: 0;position: fixed;
+            text-align: center;top: 0;width: 100%;z-index: 9999;
+        }
+        
+    *{padding:0;margin:0}
+    body{background:#fff;font-family:"Salesforce Sans", Arial, sans-serif}
+    .chart-main-sec{padding:1rem;width:100%}
+    .slds-container--large{ margin: 0 auto;padding:0 1rem}
+    .chart-heading.slds-text-heading--medium{font-weight:400;text-align:center;font-size:1rem;background:#009ddc;color:#fff;display:block;font-family:"Salesforce Sans", Arial, sans-serif;padding:0.27rem 0.5rem;border-radius: .25rem;}
+    .chart-sec-details{width:100%!important;overflow:auto}
+    .Configuration-sec .chart-filter-btn{list-style:none;width:100%;padding:1rem 0;overflow:hidden;}
+    .chart-filter-btn li{float:left;padding:0 0.5rem}
+    .chart-filter-btn li:last-child{float:right}
+    
+    .chart-filter-btn .slds-button--brand.green-button{background:#008000!important;border-color:#008000!important}
+    .chart-filter-btn .slds-button--brand.orange-button{background:#ffa500!important;border-color:#ffa500!important}
+    .chart-filter-btn .slds-button--brand.blue-button{background:#0000ff!important;border-color:#0000ff!important}
+    .chart-filter-btn .slds-button--brand.red-button{background:#ff0000!important;border-color:#ff0000!important}
+    .chart-filter-btn .slds-button--brand.purple-button{background:#800080;border-color:#800080!important}
+    .chart-filter-btn .slds-button--brand:hover{opacity:0.9}
+    
+    .Configuration-sec .chart-pager{list-style:none;text-align:center;width:100%;padding-top:1rem}
+    .chart-pager li{display:inline-block;vertical-align:top;padding:0 0.3rem}
+    .chart-pager .slds-button--brand{background:#969696;border-color:#969696;    font-size:1rem;}
+    .chart-pager .slds-button--brand:hover, .chart-pager .slds-button--brand:active,.chart-pager .slds-button--brand:focus{background:#9f9e9e;border-color:#9f9e9e;}
+    .chart-pager .slds-button--brand[disabled]{cursor: not-allowed;}
+    .chart-pager .slds-button--brand[disabled]:hover, .chart-pager .slds-button--brand[disabled]:active,.chart-pager .slds-button--brand[disabled]:focus{background:#e0e5ee;border-color:#e0e5ee;}
+    .chart-pager li:first-child{padding-left:0}
+    .chart-pager li:last-child{padding-right:0}
+    
+    @media(max-width:640px){
+     
+    .Configuration-sec .chart-filter-btn{text-align:center}
+    .chart-filter-btn li{float:none;display:inline-block;vertical-align:top;text-align:center;padding:0 0.2rem 0.6rem 0 }
+    .chart-filter-btn li:last-child{width:100%;padding:0}
+    
+    }
+     
+</style>
+ 
+    <div id="VfComp">
+        <div class="Configuration-sec">
+            <div class="chart-main-sec">
+                <apex:form id="formId1">
+                <h1 class="chart-heading slds-text-heading--medium">Opportunity Analysis</h1>
+                    <ul class="chart-filter-btn">
+                      <li>
+                        <apex:commandLink value="AZ" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand green-button" reRender="formId" status="counterStatus">
+                          <apex:param name="nickName" value="AZ" assignTo="{!filter}"/>
+                          <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+                            <use
+                              xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" >
+                            </use>
+                          </svg>
+                        </apex:commandLink>
+                      </li>
+                      <li>
+                        <apex:commandLink value="TX" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand orange-button"   reRender="formId" status="counterStatus">
+                          <apex:param name="nickName" value="TX" assignTo="{!filter}"/> 
+                          <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+                            <use
+                              xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" >
+                            </use>
+                          </svg>
+                        </apex:commandLink>
+                      </li>
+                      <li>
+                        <apex:commandLink value="CA" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand blue-button"   reRender="formId" status="counterStatus">
+                          <apex:param name="nickName" value="CA" assignTo="{!filter}"/>
+                          <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+                            <use
+                              xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" >
+                            </use>
+                          </svg>
+                        </apex:commandLink>
+                      </li>
+                      <li>
+                        <apex:commandLink value="TN" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand red-button"   reRender="formId" status="counterStatus">
+                          <apex:param name="nickName" value="TN" assignTo="{!filter}"/>
+                          <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+                            <use
+                              xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" >
+                            </use>
+                          </svg>
+                        </apex:commandLink>
+                      </li>
+                      <li>
+                        <apex:commandLink value="All Other" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand purple-button"   reRender="formId" status="counterStatus">
+                          <apex:param name="nickName" value="None" assignTo="{!filter}"/>
+                          <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+                            <use
+                              xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" >
+                            </use>
+                          </svg>
+                        </apex:commandLink>
+                      </li>
+                      <li>
+                        <apex:commandLink value="Show All" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand"   reRender="formId" status="counterStatus">
+                          <apex:param name="nickName" value="All" assignTo="{!filter}"/>
+                          <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+                            <use
+                              xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" >
+                            </use>
+                          </svg>
+                        </apex:commandLink>
+                      </li> 
+                    </ul>
+                   <apex:outputPanel id="formId">
+                    
+                    <h1 class="chart-heading slds-text-heading--medium">All Opportunities</h1>
+                    <c:OppColorCodeCmp myValue="{!jsondata}" IdVal="1"/>
+                     
+                    <ul class="chart-pager">
+                    <li>
+                      <apex:commandButton value="<
+                        <" action="{!beginning}" styleClass="slds-button slds-button--brand" disabled="{!DisablePrevious}" reRender="formId" status="counterStatus" />
+                      </li>
+                      <li>
+                        <apex:commandButton value="
+                          <" action="{!previous}" styleClass="slds-button slds-button--brand" disabled="{!DisablePrevious}" reRender="formId" status="counterStatus"/>
+                        </li>
+                        <li>
+                          <apex:commandButton value=">" action="{!next}" styleClass="slds-button slds-button--brand" disabled="{!DisableNext}" reRender="formId" status="counterStatus"/>
+                        </li>
+                        <li>
+                          <apex:commandButton value=">>" action="{!last}" styleClass="slds-button slds-button--brand" disabled="{!DisableNext}" reRender="formId" status="counterStatus"/>
+                        </li>
+                    </ul>
+                    <h1 class="chart-heading slds-text-heading--medium">Current Backlog</h1>
+                    <c:OppColorCodeCmp myValue="{!jsonDataForCB}" IdVal="2" />
+                    <h1 class="chart-heading slds-text-heading--medium">Q3 Awards</h1>
+                    <c:OppColorCodeCmp myValue="{!jsonDataForQ3AW}" IdVal="3" />
+                    <h1 class="chart-heading slds-text-heading--medium">Q3 to Be Awarded</h1>
+                    <c:OppColorCodeCmp myValue="{!jsonDataForQ3BeAW}" IdVal="4"/>
+                
+                    </apex:outputPanel>
+                  </apex:form>
+            </div>
+        </div>
+    </div>
+
+<!-- <html> 
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+ <apex:stylesheet value="{!URLFOR($Resource.SLDSConfigure,'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+<apex:includeScript value="{!URLFOR($Resource.FusionChart, '/fusioncharts/js/fusioncharts.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.FusionChart, '/js/themes/fusioncharts.theme.fint.js')}"/>
+<style>
+.requiredLoaderBG{
+            background-color: rgb(71,71,71);opacity:0.7;filter:alpha(opacity=70);background-image:url({!URLFOR($Resource.Loader)});
+            
+            background-position: center center;background-repeat: no-repeat;height: 100%;left: 0;position: fixed;
+            text-align: center;top: 0;width: 100%;z-index: 9999;
+        }
+        
+    *{padding:0;margin:0}
+    body{background:#fff;font-family:"Salesforce Sans", Arial, sans-serif}
+    .chart-main-sec{padding:1rem;width:100%}
+    .slds-container--large{ margin: 0 auto;padding:0 1rem}
+    .chart-heading.slds-text-heading--medium{font-weight:400;text-align:center;font-size:1rem;background:#009ddc;color:#fff;display:block;font-family:"Salesforce Sans", Arial, sans-serif;padding:0.27rem 0.5rem;border-radius: .25rem;}
+    .chart-sec-details{width:100%!important;overflow:auto}
+    .Configuration-sec .chart-filter-btn{list-style:none;width:100%;padding:1rem 0;overflow:hidden;}
+    .chart-filter-btn li{float:left;padding:0 0.5rem}
+    .chart-filter-btn li:last-child{float:right}
+    
+    .chart-filter-btn .slds-button--brand.green-button{background:#008000!important;border-color:#008000!important}
+    .chart-filter-btn .slds-button--brand.orange-button{background:#ffa500!important;border-color:#ffa500!important}
+    .chart-filter-btn .slds-button--brand.blue-button{background:#0000ff!important;border-color:#0000ff!important}
+    .chart-filter-btn .slds-button--brand.red-button{background:#ff0000!important;border-color:#ff0000!important}
+    .chart-filter-btn .slds-button--brand.purple-button{background:#800080;border-color:#800080!important}
+    .chart-filter-btn .slds-button--brand:hover{opacity:0.9}
+    
+    .Configuration-sec .chart-pager{list-style:none;text-align:center;width:100%;padding-top:1rem}
+    .chart-pager li{display:inline-block;vertical-align:top;padding:0 0.3rem}
+    .chart-pager .slds-button--brand{background:#969696;border-color:#969696;    font-size:1rem;}
+    .chart-pager .slds-button--brand:hover, .chart-pager .slds-button--brand:active,.chart-pager .slds-button--brand:focus{background:#9f9e9e;border-color:#9f9e9e;}
+    .chart-pager .slds-button--brand[disabled]{cursor: not-allowed;}
+    .chart-pager .slds-button--brand[disabled]:hover, .chart-pager .slds-button--brand[disabled]:active,.chart-pager .slds-button--brand[disabled]:focus{background:#e0e5ee;border-color:#e0e5ee;}
+    .chart-pager li:first-child{padding-left:0}
+    .chart-pager li:last-child{padding-right:0}
+    
+    @media(max-width:640px){
+     
+    .Configuration-sec .chart-filter-btn{text-align:center}
+    .chart-filter-btn li{float:none;display:inline-block;vertical-align:top;text-align:center;padding:0 0.2rem 0.6rem 0 }
+    .chart-filter-btn li:last-child{width:100%;padding:0}
+    
+    }
+     
+</style>
+
+
+
+</head>
+
+
+<body>
+
+ <div class="Configuration-sec">
+<div class="chart-main-sec">
+<apex:form id="formId1">
+
+<h1 class="chart-heading slds-text-heading--medium">Opportunity Analysis</h1>
+ <ul class="chart-filter-btn">
+         <li>   
+            <apex:commandLink value="AZ" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand green-button" reRender="formId" status="counterStatus">
+            <apex:param name="nickName" value="AZ" assignTo="{!filter}"/>
+            <svg aria-hidden="true" class="slds-icon slds-icon--x-small"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" ></use></svg>
+            </apex:commandLink>
+         </li>  
+         
+          <li>  
+            <apex:commandLink value="TX" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand orange-button"   reRender="formId" status="counterStatus">
+            <apex:param name="nickName" value="TX" assignTo="{!filter}"/>
+            <svg aria-hidden="true" class="slds-icon slds-icon--x-small"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" ></use></svg>
+            </apex:commandLink>
+         </li>
+         
+          <li>  
+            <apex:commandLink value="CA" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand blue-button"   reRender="formId" status="counterStatus">
+            <apex:param name="nickName" value="CA" assignTo="{!filter}"/>
+            <svg aria-hidden="true" class="slds-icon slds-icon--x-small"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" ></use></svg>
+            </apex:commandLink>
+         </li> 
+         
+          <li>  
+            <apex:commandLink value="TN" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand red-button"   reRender="formId" status="counterStatus">
+            <apex:param name="nickName" value="TN" assignTo="{!filter}"/>
+            <svg aria-hidden="true" class="slds-icon slds-icon--x-small"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" ></use></svg>
+            </apex:commandLink>
+         </li>
+         
+          <li>  
+            <apex:commandLink value="All Other" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand purple-button"   reRender="formId" status="counterStatus">
+            <apex:param name="nickName" value="None" assignTo="{!filter}"/>
+            <svg aria-hidden="true" class="slds-icon slds-icon--x-small"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" ></use></svg>
+            </apex:commandLink>
+         </li>
+         
+         <li>   
+            <apex:commandLink value="Show All" action="{!getFilterOpportunity}" styleClass="slds-button slds-button--brand"   reRender="formId" status="counterStatus">
+            <apex:param name="nickName" value="All" assignTo="{!filter}"/>
+            <svg aria-hidden="true" class="slds-icon slds-icon--x-small"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDSConfigure, 'assets/icons/utility-sprite/svg/symbols.svg#filterList')}" ></use></svg>
+            </apex:commandLink>
+         </li>
+         
+      
+  </ul>    
+ <apex:outputPanel id="formId">
+ <apex:pageMessages id="showmsg"></apex:pageMessages>
+<apex:actionStatus id="counterStatus" startStyleClass="requiredLoaderBG"/>
+
+
+  <div  id="chart-container" class="chart-sec-details">Gantt Chart Will load here!</div>
+  
+  
+  <script type="text/javascript">
+var test='{!jsondata}';
+var tesOb=JSON.parse(test);
+
+
+
+  FusionCharts.ready(function(){
+ // alert('{!jsondata}');
+  //console.log('{!jsondata}');
+    var fusioncharts = new FusionCharts({
+    
+    type: 'gantt',
+    renderAt: 'chart-container',
+    width: '2500',
+    height: '400',
+    
+    dataFormat: 'json',
+    dataSource: '{!jsondata}',
+    "events": {
+      "processClick": function(ev, props) {
+      console.log(props);
+       console.log(ev);
+        // alert(props.id);     
+        
+        showAlert(props.id);
+        function showAlert(id) {
+        if(id!=null && id != 'undefined'){
+        var url='/'+id;
+         if((typeof sforce != 'undefined') && (sforce != null))
+         {  
+                                // Salesforce1 navigation                 
+                     sforce.one.navigateToURL(url);
+         } else 
+         {
+          
+          window.open(url);
+         }
+        }
+          
+        }
+      }
+    }
+
+        
+
+});
+    fusioncharts.render();
+});
+</script>
+   <ul class="chart-pager">     
+            <li><apex:commandButton value="<<" action="{!beginning}" styleClass="slds-button slds-button--brand" disabled="{!DisablePrevious}" reRender="formId" status="counterStatus" /> </li>
+            <li> <apex:commandButton value="<" action="{!previous}" styleClass="slds-button slds-button--brand" disabled="{!DisablePrevious}" reRender="formId" status="counterStatus"/></li>
+             <li><apex:commandButton value=">" action="{!next}" styleClass="slds-button slds-button--brand" disabled="{!DisableNext}" reRender="formId" status="counterStatus"/></li>
+             <li><apex:commandButton value=">>" action="{!last}" styleClass="slds-button slds-button--brand" disabled="{!DisableNext}" reRender="formId" status="counterStatus"/>   </li>          
+</ul>
+  
+ </apex:outputPanel>   
+</apex:form>
+</div>
+</div>
+</body>
+</html> -->
+</apex:page>

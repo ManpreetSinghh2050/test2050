@@ -1,0 +1,205 @@
+<apex:page Controller="Configuration_Page_Controller" sidebar="false" showheader="false" >
+   <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
+      <apex:stylesheet value="{!URLFOR($Resource.SLDSConfigure,'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+      <style>
+         *{padding:0;margin:0}
+         body{background:url("/resource/SLDSConfigure/assets/images/body-noise.jpg") repeat 0 0;font-family:"Salesforce Sans", Arial, sans-serif}
+         .slds-container--large{ margin: 0 auto;padding:0 1rem}
+         .main-sec{border-radius:5px;border:2px solid #009ddc;box-shadow:0 0 6px rgba(0,0,0,0.6);margin:3rem 0 1rem;background:#fff}
+         .sldsform-details{padding:1.5rem 1rem 1rem;}
+         .sldsform-sec .slds-form-element__row{padding-bottom:1rem;display:flex; display:-webkit-flex; }
+         .slds-cmn-col{width:50%;padding-right:30px}
+         .sldsform-sec .slds-cmn-col+.slds-cmn-col{padding-right:0;padding-left:30px}
+         .slds-lookup-sec .lookupInput{display:flex; display:-webkit-flex; align-items: center; -webkit-align-items: center;}
+         .slds-lookup-sec .lookupInput a.slds-input{border:none;width:auto;padding:0;min-height:0;margin:0 0 0 5px}
+         .slds-btn-row{display:flex; display:-webkit-flex; justify-content: center;margin-top:1rem}
+         .Configuration-sec .heading{background:#009ddc;color:#fff;padding:0.25rem 0 0.3rem;text-align:center;font-weight:700;display:block }
+         .slds-datapicker-details .label-text{display:block}
+         .slds-datapicker-details .dateOnlyInput input{width:100%}
+         .slds-datapicker-details .dateInput{display:flex; display:-webkit-flex; align-items: center; -webkit-align-items: center;}
+         .slds-datapicker-details .dateInput .dateFormat{padding:0 10px}
+         .errorMsg{display:block;padding-top:3px;color:#ff0000;}
+         body input.btn.slds-button--brand{padding:0 1rem; text-align: center;vertical-align: middle;background: #0070d2;border: 1px solid #0070d2;color: white; font-weight:400;font-family:"Salesforce Sans", Arial, sans-serif}
+         .slds-button--brand:link, .slds-button--brand:visited, .slds-button--brand:active {color: white; }
+         body input.btn.slds-button--brand:hover, body input.btn.slds-button--brand:focus {background-color: #005fb2;color: white; }
+         body input.btn.slds-button--brand:active {background-color: #00396b; }
+         .slds-button--brand[disabled]{padding:0 1rem;font-weight:400;    cursor: not-allowed;}
+         .common-label-text{display:block;padding-bottom:3px}
+         .table-description{clear:both;width:100%;padding-top:1rem;display:flex; display:-webkit-flex;}
+         .table-description .left-sec{width:50%;padding-right:30px}
+         .table-description .right-sec{width:50%;padding-left:30px}
+         .table-description .slds-box{padding:0;overflow-x:auto;border-radius: 0 0 0.25rem 0.25rem;max-height:700px}
+         .table-description .slds-table--bordered{border:none}
+         .table-description .slds-table--bordered th{font-weight:700;border:none;background:#e8f0fc;}
+         .table-description .slds-table--bordered tbody tr:nth-child(odd) td {background:#f4f6f9}    
+         .table-description h3.slds-text-heading--medium{font-size:1rem;background:#009ddc;color:#fff;display:block;font-family:"Salesforce Sans", Arial, sans-serif;padding:0.27rem 0.5rem;border-radius: .25rem .25rem 0 0;}
+         .config-btn{border-bottom:2px solid #009ddc;padding-bottom:1rem}
+         .slds-error-message .message{border:none;padding:0.47rem 1rem 0.45rem;text-align: center;border-width: 1px;color: #fff;border-radius:0.25rem;margin:0 0 10px 0;background-image: linear-gradient(45deg,rgba(0,0,0,.025) 25%,transparent 25%,transparent 50%,rgba(0,0,0,.025) 50%,rgba(0,0,0,.025) 75%,transparent 75%,transparent);background-size: 64px 64px;background-color: rgba(194,57,52,.95);width:100%;}
+         .slds-error-message .message .messageText h4{display:inline-block;vertical-align:top;color:#fff;padding-right:5px }
+         .slds-error-message .message .messageTable .messageCell{text-align:center;float:left;width:100%;}
+         .slds-error-message .message .messageText{margin:0;}
+         .slds-error-message table td:first-child{display:none}
+         .slds-error-message table td{color:#fff;}
+         .sldsform-sec .opportunity-element__row{border-bottom:1px solid #009ddc;margin-bottom:1rem}
+         .price-col-details{position:relative}
+         .price-col-details:after{position:absolute;left:5px; top:6px; content:"$";font-weight:700}
+
+        
+      </style>
+   </head>
+   <body>
+      <div class="Configuration-sec">
+         <div class="slds-container--large">
+            <div class="main-sec">
+               <h1 class="slds-text-heading--medium heading">Opportunity Configuration</h1>
+               <div class="slds-scope sldsform-details">
+                  <apex:form id="formId" >
+                     <div class="slds-error-message">
+                        <apex:pageMessages id="showmsg"></apex:pageMessages>
+                     </div>
+                     <apex:outputPanel id="outputPanel1">
+                        <div class="sldsform-sec">
+                        <div class="slds-form-element__row opportunity-element__row">
+                        <div class="slds-cmn-col slds-lookup-sec">
+                                 <label for="oppId" class="common-label-text">Select Opportunity</label>
+                                 <apex:inputField styleclass="slds-input" id="oppId" value="{!oli.OpportunityId}" >
+                                 <apex:actionSupport event="onchange" action="{!getingValues}" reRender="formId" />
+                                 </apex:inputField>
+                              </div>
+                        </div>
+                           <!-- <apex:outputPanel rendered="{!flag}"> -->
+                           <div class="slds-form-element__row ">
+                              <div class="slds-cmn-col">
+                                 <label for="glassamountid" class="common-label-text">Glass-Amount</label>
+                                 <div class="price-col-details"><apex:inputtext html-readonly="true" styleclass="slds-input" id="glassamountid" value="{!glassamount}"/></div>
+                              </div>
+                               <div class="slds-cmn-col">
+                                 <label for="Metalamountid" class="common-label-text">Metal-Amount</label>
+                                <div class="price-col-details"> <apex:inputtext html-readonly="true" styleclass="slds-input" id="Metalamountid" value="{!metalamount}"/></div>
+                              </div>
+                              
+                           </div>
+                           <div class="slds-form-element__row slds-datapicker-details">
+                              <div class="slds-cmn-col">
+                                 <label for="glassdateid" class="common-label-text">Glass Start Date</label>
+                                 <span class="slds-input">
+                                 <apex:outputfield styleclass="slds-input" id="glassdateid" value="{!OppVar.G_Est_Start_Date__c}"/>
+                                 </span>
+                              </div>
+                              
+                              <div class="slds-cmn-col">
+                                 <label for="metaldateid" class="common-label-text">Metal Start Date</label>
+                                 <span class="slds-input">
+                                 <apex:outputfield styleclass="slds-input" id="metaldateid" value="{!OppVar.M_Est_Start_Date__c}"/>
+                                 </span>
+                              </div>
+                              
+                              
+                           </div>
+                            <div class="slds-form-element__row">
+                            <div class="slds-cmn-col">
+                                 <label for="dateid2" class="common-label-text">Field Completion Date</label>
+                                  <span class="slds-input">
+                                 <apex:outputfield styleclass="slds-output" id="dateid2" value="{!oppVar.Field_Completion_Date__c}"/>
+                                 </span>
+                              </div>
+                            </div>
+                           
+                           <!-- <div class="config-btn">
+                              <apex:commandButton styleClass="slds-button slds-button--brand"  value="Click To Config" action="{!showPanel}" rerender="formId"/>
+                           </div> -->
+                           
+                           
+                        </div>
+                    </apex:outputPanel> 
+                     
+                     <apex:outputPanel rendered="{!flag}"> 
+                     <div class="table-description">
+                        <div class="left-sec">
+                         <apex:outputPanel id="outputpanel2" rendered="{!flag}">
+                          <h3 class="slds-text-heading--medium ">Glass</h3>
+                           <div class="slds-box">
+                             
+                               
+                                 <table class="slds-table slds-table--bordered">
+                                    <tr>
+                                       <th>Fields</th>
+                                       <th>Percentage</th>
+                                       <th>Monthly Amount</th>
+                                    </tr>
+                                    <apex:repeat value="{!glassSort}" var="key">
+                                       <apex:repeat value="{!glassWrapperMap[key]}" var="wrapper">
+                                          <tr>
+                                             <td>
+                                                <apex:outputText value="{!wrapper.label}"/>
+                                             </td>
+                                             <td>
+                                                <apex:inputText html-readonly="true" styleclass="slds-input" value="{!wrapper.percentage}"/>
+                                             </td>
+                                             <td>
+                                             <div class="price-col-details">
+                                                <apex:inputText html-readonly="true" styleclass="slds-input" value="{!wrapper.monthAmount}"/>
+                                                </div>
+                                             </td>
+                                          </tr>
+                                       </apex:repeat>
+                                    </apex:repeat>
+                                 </table>
+                             
+                           </div>
+                            </apex:outputPanel>
+                        </div>
+                       
+                        <div class="right-sec">
+                         <apex:outputPanel id="outputpanel3" rendered="{!flag}">
+                            <h3 class="slds-text-heading--medium ">Metal</h3>
+                           <div class="slds-box">
+                             
+                             
+                                 <table class="slds-table slds-table--bordered">
+                                    <tr>
+                                       <th>Fields</th>
+                                       <th>Percentage</th>
+                                       <th>Monthly Amount</th>
+                                    </tr>
+                                 <apex:repeat value="{!metalSort}" var="key">
+                                       <apex:repeat value="{!metalWrapperMap[key]}" var="wrapper">
+                                          <tr>
+                                             <td>
+                                                <apex:outputText value="{!wrapper.label}"/>
+                                             </td>
+                                             <td>
+                                                <apex:inputText html-readonly="true" styleclass="slds-input" value="{!wrapper.percentage}"/>
+                                             </td>
+                                             <td>
+                                              <div class="price-col-details">
+                                                <apex:inputText html-readonly="true"  styleclass="slds-input" value="{!wrapper.monthAmount}"/>
+                                                </div>
+                                             </td>
+                                          </tr>
+                                       </apex:repeat>
+                                    </apex:repeat> 
+                                 </table>
+                             
+                           </div>
+                            </apex:outputPanel>
+                        </div>
+                     </div>
+                     <div class="slds-btn-row" role="group">
+                        <!-- <apex:commandButton styleClass="slds-button slds-button--brand" value="Preview" action="{!PreviewPercentage}" rerender="formId"/> -->
+                        <apex:commandButton styleClass="slds-button slds-button--brand" value="Save" action="{!saveOpportunity}" rerender="formId" >
+                           <apex:param assignTo="{!buttonSwap}" value="false"/>
+                        </apex:commandButton>
+                        <apex:commandButton styleClass="slds-button slds-button--brand" value="Save And New" action="{!saveOpportunity}"  rerender="formId" >
+                           <apex:param assignTo="{!buttonSwap}" value="true"/>
+                        </apex:commandButton>
+                     </div>
+              </apex:outputPanel>
+                  </apex:form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </body>
+</apex:page>
